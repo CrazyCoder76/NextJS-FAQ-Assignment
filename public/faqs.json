@@ -1,0 +1,62 @@
+[
+  {
+    "Q": "What data sources are used to train the model and how far back do they go?",
+    "A": "30-minute Market data (high, low, close, volume, sector and market) - 2014-01-01\n\nDaily Google trends (how many times that company name was searched) - 2014-01-01\n\nDaily News Articles with sentiment analysis - 2022-01-01\n\n30-minute Futures data (close values) - 2014-01-01\n\nDaily Fed interest rate - 2014-01-01\n\nDaily Yield rate - 2014-01-01",
+    "T": "data"
+  },
+  {
+    "Q": "How are you incorporating earnings events?",
+    "A": "Currently, we’re not. We rely on the seasonality of news and trend data to indicate the anticipation and reaction to earnings events.",
+    "T": "assumption"
+  },
+  {
+    "Q": "How are you using trend, news and news sentiment data?",
+    "A": "We aggregate trend data and number of news articles into one value. This indicates how much chatter/interest there was for a company/ticker that day. Then, we have a different value for the sentiment of the articles indicating if it was positive or negative.",
+    "T": "ML"
+  },
+  {
+    "Q": "What other data sources will you be adding?",
+    "A": "We’d like to add Twitter and Reddit data. It'll be included by the end of 2024.",
+    "T": "data"
+  },
+  {
+    "Q": "How often is the model updated?",
+    "A": "The model is trained weekly. The files fed to the model to make predictions are updated each morning at 7am EST to account for overnight activity/influences.",
+    "T": "ML"
+  },
+  {
+    "Q": "How do you choose which stocks to run?",
+    "A": "Volume. We make sure the 30-min volume averages more than 30,000. This way trades should process when executed.",
+    "T": "data"
+  },
+  {
+    "Q": "What algorithm is used to train the model?",
+    "A": "We use AWS’s DeepAR model. It’s a model built for time series data that has both dynamic features (ours: news, trend, and sentiment data) as well as categories (ours: EFT and market data). It’s very good at predicting shape.",
+    "T": "ML"
+  },
+  {
+    "Q": "Why is Optima Trade invite-only?",
+    "A": "The small number has to do with two things: community and making sure we don't influence the patterns we're leveraging. \n\nCommunity: The goal is to share knowledge and wisdom so that we all better leverage the predictions. \n\nInfluence: If we were to open it up to whomever, there’s a chance that many people would place the same trade at the same time. This would then start to influence the patterns we’re looking to exploit.\n\nFor example, if 500 people were using the platform and 60% of them decided to buy 2000 shares of ABM trade at 9:30am, that’s 300*2000 = 600,000 shares. That’s a spike that will change the shape of the chart.",
+    "T": "assumption"
+  },
+  {
+    "Q": "What’s the general theory behind this approach?",
+    "A": "Mundane patterns. The markets display repeating, mundane patterns and, thus, are predictable. Consequently, we’re not looking for aberrations. We’re looking for the norm. Which patterns repeat over and over and over again?\n\nFor example, trend data shows us that excitement has a short tail and seasonality has a long tail. Combine the two and you get a better understanding of the animal.",
+    "T": "assumption"
+  },
+  {
+    "Q": "How do you calculate confidence?",
+    "A": "Every morning we process the previous day’s predictions. Therefore, each stock, trade type, trade time, and diraction pulls the total number of matching trades as the denominator and , of that group, those that 'won' as the numerator.",
+    "T": "ML"
+  },
+  {
+    "Q": "Why aren't prices included in the predictions?",
+    "A": "The DeepAR model is much better with shapes than it is with exact values. So, instead of focusing on the prices, we focus on the shape as it extends across time. That’s why you see the times at which you should buy and sell (or short and cover) instead of the prices.\n\nThis also means that while trading, make sure the shape of the prediction line is more or less parallel to the actual values. If so, then the model predicted well. If not, then maybe find another trade/prediction.",
+    "T": "ML"
+  },
+  {
+    "Q": "How does the sytem backtest?",
+    "A": "Let's say the prediction was to buy at 10:00 and sell at 12:00 and the profit stop is $0.20 and the los stop is $0.40. To backtest, the opening price of the stock at 10:00 is used as the entry price. Let's say it was $10.00. Then, for every 30 minute interval from 10:00 to 12:00, the target price (entry price + the profit stop = $10.20) is compared against the high and low values. If the high value is greater than $10.20, then the profit is recorded as $0.20. If the high value is between the entry price and the target price, the trailing stop is moved up (close value - entry price). If the low value is less than the trailing stop, then the loss is recorded. If the trade never hits a high or low value, then the closing price at 12:00 is recorded as the final price.",
+    "T": "data"
+  }
+]
